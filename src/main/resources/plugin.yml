@@ -1,0 +1,6 @@
+name: ${name}
+version: ${version}
+main: de.kevin_stefan.virtualChests.VirtualChests
+api-version: '1.21.5'
+authors: [ Kevin Stefan ]
+website: https://modrinth.com/project/virtual-chests
