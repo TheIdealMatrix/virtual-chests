@@ -1,0 +1,17 @@
+config-version: 1 # <- do not change this line!
+debug: false
+storage:
+  type: 'sqlite' # sqlite or mysql
+  mysql:
+    address: 'localhost:3306'
+    database: 'virtual_chests'
+    username: 'virtual_chests'
+    password: 'secure-password'
+chest_rows: 6 # 1-6
+command_name: 'chest'
+lang:
+  PREFIX: 'VirtualChests > '
+  CHEST_NAME: '%player% > %number%'
+  OPEN_CHEST: '%prefix%<green>Opening Chest %number%...'
+  OPEN_CHEST_OTHER: '%prefix%<green>Opening Chest %number% of %player%...'
+  NO_CHEST: "%prefix%<red>You don't own Chest %number%"
