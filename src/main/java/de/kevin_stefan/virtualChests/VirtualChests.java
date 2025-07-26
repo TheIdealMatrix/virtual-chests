@@ -1,17 +1,24 @@
 package de.kevin_stefan.virtualChests;
 
-import org.bukkit.plugin.java.JavaPlugin;
+import de.kevin_stefan.virtualChests.utils.MinecraftPlugin;
 
-public final class VirtualChests extends JavaPlugin {
+public final class VirtualChests extends MinecraftPlugin {
+
+    private static VirtualChests instance;
 
     @Override
     public void onEnable() {
-        // Plugin startup logic
+        super.onEnable();
+        instance = this;
     }
 
     @Override
     public void onDisable() {
         // Plugin shutdown logic
+    }
+
+    public static VirtualChests getInstance() {
+        return instance;
     }
 
 }
