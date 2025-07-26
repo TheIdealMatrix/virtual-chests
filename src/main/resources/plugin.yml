@@ -4,3 +4,13 @@ main: de.kevin_stefan.virtualChests.VirtualChests
 api-version: '1.21.5'
 authors: [ Kevin Stefan ]
 website: https://modrinth.com/project/virtual-chests
+libraries:
+  - org.hibernate.orm:hibernate-core:7.0.0.Final
+  - org.hibernate.orm:hibernate-c3p0:7.0.0.Final
+  - org.hibernate.orm:hibernate-community-dialects:7.0.0.Final
+  - dev.dejvokep:boosted-yaml:1.3.7
+  - dev.dejvokep:boosted-yaml-spigot:1.4
+permissions:
+  virtualchests.admin:
+    children:
+      virtualchests.use: true
