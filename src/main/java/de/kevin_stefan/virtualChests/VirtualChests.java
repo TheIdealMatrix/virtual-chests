@@ -1,5 +1,6 @@
 package de.kevin_stefan.virtualChests;
 
+import de.kevin_stefan.virtualChests.storage.StorageProvider;
 import de.kevin_stefan.virtualChests.utils.MinecraftPlugin;
 
 public final class VirtualChests extends MinecraftPlugin {
@@ -10,11 +11,12 @@ public final class VirtualChests extends MinecraftPlugin {
     public void onEnable() {
         super.onEnable();
         instance = this;
+        StorageProvider.getInstance().testConnection();
     }
 
     @Override
     public void onDisable() {
-        // Plugin shutdown logic
+        StorageProvider.close();
     }
 
     public static VirtualChests getInstance() {
