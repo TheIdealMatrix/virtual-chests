@@ -1,6 +1,8 @@
 package de.kevin_stefan.virtualChests.utils;
 
 import dev.dejvokep.boostedyaml.YamlDocument;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 
 import java.lang.reflect.RecordComponent;
 
@@ -27,6 +29,10 @@ public final class PluginLanguage {
             }
         }
         return message;
+    }
+
+    public <T extends Record> Component getFormatted(T record) {
+        return MiniMessage.miniMessage().deserialize(get(record));
     }
 
 }

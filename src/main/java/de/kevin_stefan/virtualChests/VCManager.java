@@ -21,9 +21,9 @@ public class VCManager {
 
     public static void openChest(Player player, OfflinePlayer targetPlayer, int number) {
         if (!openChests.containsKey(targetPlayer.getUniqueId())) {
-            String message = VirtualChests.getPluginLanguage().get(new Lang.CHEST_NAME(targetPlayer.getName(), number));
+            Component title = VirtualChests.getPluginLanguage().getFormatted(new Lang.CHEST_NAME(targetPlayer.getName(), number));
             int size = VirtualChests.getPluginConfig().getInt("chest_rows") * 9;
-            Inventory inventory = Bukkit.createInventory(null, size, Component.text(message));
+            Inventory inventory = Bukkit.createInventory(null, size, title);
 
             VirtualChest virtualChest = StorageProvider.getInstance().getVChest(targetPlayer.getUniqueId(), number);
             if (virtualChest == null) {
