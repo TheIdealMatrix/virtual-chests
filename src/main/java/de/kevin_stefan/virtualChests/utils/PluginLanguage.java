@@ -2,7 +2,7 @@ package de.kevin_stefan.virtualChests.utils;
 
 import dev.dejvokep.boostedyaml.YamlDocument;
 
-import java.util.List;
+import java.lang.reflect.RecordComponent;
 
 public final class PluginLanguage {
 
@@ -14,19 +14,19 @@ public final class PluginLanguage {
         this.PREFIX = config.getString("lang.PREFIX");
     }
 
-    public <T extends ILang> String get(T lang, Object... objects) {
-        String message = config.getString("lang." + lang.name());
-        message = message.replaceAll("%prefix%", PREFIX);
-        for (int i = 0; i < lang.getParams().size(); i++) {
-            message = message.replaceAll("%" + lang.getParams().get(i) + "%", String.valueOf(objects[i]));
+    public <T extends Record> String get(T record) {
+        Class<?> clazz = record.getClass();
+        String message = config.getString("lang." + clazz.getSimpleName()).replaceAll("%prefix%", PREFIX);
+        for (RecordComponent component : clazz.getRecordComponents()) {
+            try {
+                String name = component.getName();
+                Object value = component.getAccessor().invoke(record);
+                message = message.replaceAll("%" + name + "%", String.valueOf(value));
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
         }
         return message;
-    }
-
-    public interface ILang {
-        String name();
-
-        List<String> getParams();
     }
 
 }

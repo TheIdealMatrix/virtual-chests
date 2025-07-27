@@ -20,11 +20,11 @@ public final class ChestCommand {
                 .executesPlayer((player, args) -> {
                     int number = (int) args.get("number");
                     if (!player.hasPermission("virtualchests.open." + number)) {
-                        player.sendMessage(VirtualChests.getPluginLanguage().get(Lang.NO_CHEST, number));
+                        player.sendMessage(VirtualChests.getPluginLanguage().get(new Lang.NO_CHEST(number)));
                         return;
                     }
 
-                    player.sendMessage(VirtualChests.getPluginLanguage().get(Lang.OPEN_CHEST, number));
+                    player.sendMessage(VirtualChests.getPluginLanguage().get(new Lang.OPEN_CHEST(number)));
                     VCManager.openChest(player, player, number);
                 }).then(new OfflinePlayerArgument("player")
                     .replaceSafeSuggestions(SafeSuggestions.suggest(info ->
@@ -34,7 +34,7 @@ public final class ChestCommand {
                     .executesPlayer((player, args) -> {
                         int number = (int) args.get("number");
                         OfflinePlayer targetPlayer = (OfflinePlayer) args.get("player");
-                        player.sendMessage(VirtualChests.getPluginLanguage().get(Lang.OPEN_CHEST_OTHER, number, targetPlayer.getName()));
+                        player.sendMessage(VirtualChests.getPluginLanguage().get(new Lang.OPEN_CHEST_OTHER(number, targetPlayer.getName())));
                         VCManager.openChest(player, targetPlayer, number);
                     })
                 )
