@@ -32,6 +32,9 @@ public class VCManager {
                 virtualChest.setNumber(number);
             } else {
                 ItemStack[] items = ItemStack.deserializeItemsFromBytes(virtualChest.getContent());
+                if (items.length > inventory.getSize()) {
+                    throw new RuntimeException(String.format("More items than space in chest. Did you lower chest_rows in config? (expected %d, got %d)", items.length / 9, inventory.getSize() / 9));
+                }
                 inventory.setContents(items);
             }
 
