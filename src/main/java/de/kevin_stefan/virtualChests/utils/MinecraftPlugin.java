@@ -20,8 +20,8 @@ public abstract class MinecraftPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        logger = new PluginLogger(getLogger());
         config = initializeConfig();
+        logger = new PluginLogger(getLogger(), config.getBoolean("debug", false));
         language = new PluginLanguage(config);
     }
 
