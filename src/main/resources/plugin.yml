@@ -14,3 +14,21 @@ permissions:
   virtualchests.admin:
     children:
       virtualchests.use: true
+  virtualchests.multiple.3:
+    children:
+      virtualchests.open.1: true
+      virtualchests.open.2: true
+      virtualchests.open.3: true
+  virtualchests.multiple.5:
+    children:
+      virtualchests.multiple.3: true
+      virtualchests.open.4: true
+      virtualchests.open.5: true
+  virtualchests.multiple.10:
+    children:
+      virtualchests.multiple.5: true
+      virtualchests.open.6: true
+      virtualchests.open.7: true
+      virtualchests.open.8: true
+      virtualchests.open.9: true
+      virtualchests.open.10: true
