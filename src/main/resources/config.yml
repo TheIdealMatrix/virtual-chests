@@ -10,8 +10,8 @@ storage:
 chest_rows: 6 # 1-6
 command_name: 'chest'
 lang:
-  PREFIX: 'VirtualChests > '
-  CHEST_NAME: '%player% > %number%'
+  PREFIX: '<blue><bold>VirtualChests > </bold></blue>'
+  CHEST_NAME: '<blue>%player% > %number%'
   OPEN_CHEST: '%prefix%<green>Opening Chest %number%...'
   OPEN_CHEST_OTHER: '%prefix%<green>Opening Chest %number% of %player%...'
   NO_CHEST: "%prefix%<red>You don't own Chest %number%"
