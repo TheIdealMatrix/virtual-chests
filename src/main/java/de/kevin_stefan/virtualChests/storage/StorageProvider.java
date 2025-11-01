@@ -2,6 +2,7 @@ package de.kevin_stefan.virtualChests.storage;
 
 import de.kevin_stefan.virtualChests.VirtualChests;
 import de.kevin_stefan.virtualChests.storage.model.VirtualChest;
+import de.kevin_stefan.virtualChests.storage.model.VirtualChestHistory;
 import dev.dejvokep.boostedyaml.YamlDocument;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
@@ -10,6 +11,7 @@ import org.hibernate.cfg.Configuration;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
+import java.util.List;
 import java.util.UUID;
 
 public class StorageProvider {
@@ -50,6 +52,7 @@ public class StorageProvider {
 
         Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
         dbConfig.addAnnotatedClass(VirtualChest.class);
+        dbConfig.addAnnotatedClass(VirtualChestHistory.class);
 
         factory = dbConfig.buildSessionFactory();
     }
@@ -73,8 +76,7 @@ public class StorageProvider {
         }
     }
 
-    @Nullable
-    public VirtualChest getVChest(UUID player, int number) {
+    public @Nullable VirtualChest getVChest(UUID player, int number) {
         try (EntityManager manager = factory.createEntityManager()) {
             TypedQuery<VirtualChest> query = manager.createNamedQuery("VirtualChest.get", VirtualChest.class);
             query.setParameter("player", player);
@@ -83,7 +85,7 @@ public class StorageProvider {
         }
     }
 
-    public VirtualChest setVChest(VirtualChest vChest) {
+    public @Nullable VirtualChest setVChest(VirtualChest vChest) {
         try (EntityManager manager = factory.createEntityManager()) {
             manager.getTransaction().begin();
             VirtualChest virtualChest = manager.merge(vChest);
@@ -96,6 +98,41 @@ public class StorageProvider {
         try (EntityManager manager = factory.createEntityManager()) {
             manager.getTransaction().begin();
             manager.remove(vChest);
+            manager.getTransaction().commit();
+        }
+    }
+
+    public @Nullable VirtualChestHistory getLastVChestHistory(UUID player, int number) {
+        try (EntityManager manager = factory.createEntityManager()) {
+            TypedQuery<VirtualChestHistory> query = manager.createNamedQuery("VirtualChestHistory.get", VirtualChestHistory.class);
+            query.setParameter("player", player);
+            query.setParameter("number", number);
+            query.setMaxResults(1);
+            return query.getSingleResultOrNull();
+        }
+    }
+
+    public @Nullable List<VirtualChestHistory> getVChestHistory(UUID player, int number) {
+        try (EntityManager manager = factory.createEntityManager()) {
+            TypedQuery<VirtualChestHistory> query = manager.createNamedQuery("VirtualChestHistory.get", VirtualChestHistory.class);
+            query.setParameter("player", player);
+            query.setParameter("number", number);
+            return query.getResultList();
+        }
+    }
+
+    public void addVChestHistory(VirtualChestHistory vChestHistory) {
+        try (EntityManager manager = factory.createEntityManager()) {
+            manager.getTransaction().begin();
+            manager.persist(vChestHistory);
+            manager.getTransaction().commit();
+        }
+    }
+
+    public void deleteVChestHistory(VirtualChestHistory vChestHistory) {
+        try (EntityManager manager = factory.createEntityManager()) {
+            manager.getTransaction().begin();
+            manager.remove(vChestHistory);
             manager.getTransaction().commit();
         }
     }
