@@ -14,6 +14,7 @@ import java.util.UUID;
 @Entity
 @Table(name = "virtual_chests_history")
 @NamedQuery(name = "VirtualChestHistory.get", query = "from VirtualChestHistory where player = :player and number = :number order by timestamp desc")
+@NamedQuery(name = "VirtualChestHistory.getOne", query = "from VirtualChestHistory where id = :id and player = :player and number = :number")
 public class VirtualChestHistory {
 
     @Id

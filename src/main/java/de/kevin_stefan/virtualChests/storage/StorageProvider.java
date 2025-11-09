@@ -112,12 +112,24 @@ public class StorageProvider {
         }
     }
 
-    public @Nullable List<VirtualChestHistory> getVChestHistory(UUID player, int number) {
+    public List<VirtualChestHistory> getVChestHistory(UUID player, int number) {
         try (EntityManager manager = factory.createEntityManager()) {
             TypedQuery<VirtualChestHistory> query = manager.createNamedQuery("VirtualChestHistory.get", VirtualChestHistory.class);
             query.setParameter("player", player);
             query.setParameter("number", number);
+            query.setMaxResults(50);
             return query.getResultList();
+        }
+    }
+
+    public @Nullable VirtualChestHistory getVChestHistory(int id, UUID player, int number) {
+        try (EntityManager manager = factory.createEntityManager()) {
+            TypedQuery<VirtualChestHistory> query = manager.createNamedQuery("VirtualChestHistory.getOne", VirtualChestHistory.class);
+            query.setParameter("id", id);
+            query.setParameter("player", player);
+            query.setParameter("number", number);
+            query.setMaxResults(1);
+            return query.getSingleResultOrNull();
         }
     }
 
