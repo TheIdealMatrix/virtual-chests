@@ -14,4 +14,28 @@ public final class Lang {
     public record NO_CHEST(int number) {
     }
 
+    public record HISTORY_LIST_HEADER(int number, String player) {
+    }
+
+    public record HISTORY_LIST_LINE(int number, String player, long id, String date) {
+    }
+
+    public record HISTORY_LIST_FOOTER(int number, String player) {
+    }
+
+    public record HISTORY_DATE_FORMAT() {
+    }
+
+    public record HISTORY_CHEST_NAME(int number, String player, int id, String date) {
+    }
+
+    public record HISTORY_NOT_FOUND(int number, String player) {
+    }
+
+    public record HISTORY_NOT_FOUND_ID(int number, String player, int id) {
+    }
+
+    public record HISTORY_RESTORED(int number, String player, int id, String date) {
+    }
+
 }

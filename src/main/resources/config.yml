@@ -1,17 +1,25 @@
-config-version: 1 # <- do not change this line!
+config-version: "2" # <- do not change this line!
 debug: false
 storage:
-  type: 'sqlite' # sqlite or mysql
+  type: "sqlite" # sqlite or mysql
   mysql:
-    address: 'localhost:3306'
-    database: 'virtual_chests'
-    username: 'virtual_chests'
-    password: 'secure-password'
+    address: "localhost:3306"
+    database: "virtual_chests"
+    username: "virtual_chests"
+    password: "secure-password"
 chest_rows: 6 # 1-6
-command_name: 'chest'
+command_name: "chest"
 lang:
-  PREFIX: '<blue><bold>VirtualChests > </bold></blue>'
-  CHEST_NAME: '<blue>%player% > %number%'
-  OPEN_CHEST: '%prefix%<green>Opening Chest %number%...'
-  OPEN_CHEST_OTHER: '%prefix%<green>Opening Chest %number% of %player%...'
-  NO_CHEST: "%prefix%<red>You don't own Chest %number%"
+  PREFIX: "<blue><bold>VirtualChests > </bold></blue>"
+  CHEST_NAME: "<blue>%player% > %number%" # number, player
+  OPEN_CHEST: "%prefix%<green>Opening Chest %number%..." # number
+  OPEN_CHEST_OTHER: "%prefix%<green>Opening Chest %number% of %player%..." #  # number, player
+  NO_CHEST: "%prefix%<red>You don't own Chest %number%" # number
+  HISTORY_LIST_HEADER: "%prefix%<green>Chest %number% History of %player%:</green>" # number, player
+  HISTORY_LIST_LINE: "<gray>#<gold>%id%</gold> > %date% <click:run_command:/chest %number% %player% history %id% view><hover:show_text:'Click to view #%id%'><gold>[view]</gold></hover></click>" # number, player, id, date
+  HISTORY_LIST_FOOTER: "<gray>------------------------------" # number, player
+  HISTORY_DATE_FORMAT: "MMM dd, yyyy HH:mm:ss" # See: https://docs.oracle.com/javase/8/docs/api/java/text/SimpleDateFormat.html
+  HISTORY_CHEST_NAME: "<blue>#%id% %player% > %number%" # number, player, id, date
+  HISTORY_NOT_FOUND: "%prefix%<red>Player %player% does not have history for chest %number%" # number, player
+  HISTORY_NOT_FOUND_ID: "%prefix%<red>Could not find Chest History with id %id% for player %player% and chest %number%" # number, player, id
+  HISTORY_RESTORED: "%prefix%<green>History #%id% for chest %number% of player %player% restored" # number, player, id, date
