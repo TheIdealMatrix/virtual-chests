@@ -9,6 +9,7 @@ storage:
     password: "secure-password"
 chest_rows: 6 # 1-6
 command_name: "chest"
+keep_last: 50 # How many history entries to keep (per chest of a player)
 lang:
   PREFIX: "<blue><bold>VirtualChests > </bold></blue>"
   CHEST_NAME: "<blue>%player% > %number%" # number, player

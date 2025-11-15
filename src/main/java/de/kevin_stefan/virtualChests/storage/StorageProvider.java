@@ -6,6 +6,7 @@ import de.kevin_stefan.virtualChests.storage.model.VirtualChestHistory;
 import dev.dejvokep.boostedyaml.YamlDocument;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
 import org.hibernate.cfg.Configuration;
 import org.jetbrains.annotations.Nullable;
@@ -117,7 +118,7 @@ public class StorageProvider {
             TypedQuery<VirtualChestHistory> query = manager.createNamedQuery("VirtualChestHistory.get", VirtualChestHistory.class);
             query.setParameter("player", player);
             query.setParameter("number", number);
-            query.setMaxResults(50);
+            query.setMaxResults(VirtualChests.getPluginConfig().getInt("keep_last"));
             return query.getResultList();
         }
     }
@@ -136,7 +137,15 @@ public class StorageProvider {
     public void addVChestHistory(VirtualChestHistory vChestHistory) {
         try (EntityManager manager = factory.createEntityManager()) {
             manager.getTransaction().begin();
+
             manager.persist(vChestHistory);
+
+            Query deleteQuery = manager.createQuery("delete from VirtualChestHistory where player = :player and number = :number and id not in (select id from VirtualChestHistory where player = :player and number = :number order by timestamp desc limit :limit)");
+            deleteQuery.setParameter("player", vChestHistory.getPlayer());
+            deleteQuery.setParameter("number", vChestHistory.getNumber());
+            deleteQuery.setParameter("limit", VirtualChests.getPluginConfig().getInt("keep_last"));
+            deleteQuery.executeUpdate();
+
             manager.getTransaction().commit();
         }
     }
