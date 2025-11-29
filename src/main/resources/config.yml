@@ -10,6 +10,7 @@ storage:
 chest_rows: 6 # 1-6
 command_name: "chest"
 keep_last: 50 # How many history entries to keep (per chest of a player)
+history_page_size: 10 # How many entries per history page
 lang:
   PREFIX: "<blue><bold>VirtualChests > </bold></blue>"
   CHEST_NAME: "<blue>%player% > %number%" # number, player
@@ -18,9 +19,10 @@ lang:
   NO_CHEST: "%prefix%<red>You don't own Chest %number%" # number
   HISTORY_LIST_HEADER: "%prefix%<green>Chest %number% History of %player%:</green>" # number, player
   HISTORY_LIST_LINE: "<gray>#<gold>%id%</gold> > %date% <click:run_command:/chest %number% %player% history %id% view><hover:show_text:'Click to view #%id%'><gold>[view]</gold></hover></click>" # number, player, id, date
-  HISTORY_LIST_FOOTER: "<gray>------------------------------" # number, player
+  HISTORY_LIST_FOOTER: "<gray>---< <click:run_command:/chest %number% %player% history -page %prev_page%><hover:show_text:'Go to page %prev_page%'><gold>Previous</gold></hover></click> >-< %page%/%max_page% >-< <click:run_command:/chest %number% %player% history -page %next_page%><hover:show_text:'Go to page %next_page%'><gold>Next</gold></hover></click> >---" # number, player, page, max_page, prev_page, next_page
   HISTORY_DATE_FORMAT: "MMM dd, yyyy HH:mm:ss" # See: https://docs.oracle.com/javase/8/docs/api/java/text/SimpleDateFormat.html
   HISTORY_CHEST_NAME: "<blue>#%id% %player% > %number%" # number, player, id, date
   HISTORY_NOT_FOUND: "%prefix%<red>Player %player% does not have history for chest %number%" # number, player
+  HISTORY_NOT_FOUND_PAGE: "%prefix%<red>Page %page% not found" # number, player, page
   HISTORY_NOT_FOUND_ID: "%prefix%<red>Could not find Chest History with id %id% for player %player% and chest %number%" # number, player, id
   HISTORY_RESTORED: "%prefix%<green>History #%id% for chest %number% of player %player% restored" # number, player, id, date

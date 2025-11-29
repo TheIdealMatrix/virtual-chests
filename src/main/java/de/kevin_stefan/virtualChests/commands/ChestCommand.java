@@ -43,6 +43,11 @@ public final class ChestCommand {
                     .executes(ctx -> handlePlayerOnly(ctx, ChestCommand::runOpenOtherCommand))
                     .then(Commands.literal("history")
                         .executes(ctx -> handlePlayerOnly(ctx, ChestCommand::runShowHistoryList))
+                        .then(Commands.literal("-page")
+                            .then(Commands.argument("page", IntegerArgumentType.integer(1))
+                                .executes(ctx -> handlePlayerOnly(ctx, ChestCommand::runShowHistoryList))
+                            )
+                        )
                         .then(Commands.argument("id", IntegerArgumentType.integer())
                             .then(Commands.literal("view")
                                 .executes(ctx -> handlePlayerOnly(ctx, ChestCommand::runViewHistory))
@@ -93,14 +98,24 @@ public final class ChestCommand {
     private static int runShowHistoryList(CommandContext<CommandSourceStack> ctx, Player player) throws CommandSyntaxException {
         int number = IntegerArgumentType.getInteger(ctx, "number");
         final Player targetPlayer = ctx.getArgument("player", PlayerSelectorArgumentResolver.class).resolve(ctx.getSource()).getFirst();
+        int page = 1;
+        try {
+            page = IntegerArgumentType.getInteger(ctx, "page");
+        } catch (IllegalArgumentException ignored) {
+        }
 
-        List<VirtualChestHistory> history = StorageProvider.getInstance().getVChestHistory(targetPlayer.getUniqueId(), number);
+        List<VirtualChestHistory> history = StorageProvider.getInstance().getVChestHistory(targetPlayer.getUniqueId(), number, page);
         if (history.isEmpty()) {
+            if (page != 1) {
+                Component message = VirtualChests.getPluginLanguage().getFormatted(new Lang.HISTORY_NOT_FOUND_PAGE(number, targetPlayer.getName(), page));
+                player.sendMessage(message);
+                return Command.SINGLE_SUCCESS;
+            }
             Component message = VirtualChests.getPluginLanguage().getFormatted(new Lang.HISTORY_NOT_FOUND(number, targetPlayer.getName()));
             player.sendMessage(message);
             return Command.SINGLE_SUCCESS;
         }
-        Component message = buildHistoryMessage(history, number, targetPlayer.getName());
+        Component message = buildHistoryMessage(history, number, targetPlayer, page);
         player.sendMessage(message);
         return Command.SINGLE_SUCCESS;
     }
@@ -157,13 +172,17 @@ public final class ChestCommand {
         return dateFormat.format(new Date(timestamp));
     }
 
-    private static Component buildHistoryMessage(List<VirtualChestHistory> history, int number, String player) {
-        String header = VirtualChests.getPluginLanguage().get(new Lang.HISTORY_LIST_HEADER(number, player));
-        String footer = VirtualChests.getPluginLanguage().get(new Lang.HISTORY_LIST_FOOTER(number, player));
+    private static Component buildHistoryMessage(List<VirtualChestHistory> history, int number, Player player, int page) {
+        long entries = StorageProvider.getInstance().getVChestHistoryCount(player.getUniqueId(), number);
+        int pageSize = VirtualChests.getPluginConfig().getInt("history_page_size");
+        int maxPage = Math.ceilDiv(Math.toIntExact(entries), pageSize);
+
+        String header = VirtualChests.getPluginLanguage().get(new Lang.HISTORY_LIST_HEADER(number, player.getName()));
+        String footer = VirtualChests.getPluginLanguage().get(new Lang.HISTORY_LIST_FOOTER(number, player.getName(), page, maxPage, page - 1, page + 1));
 
         String lines = history.stream().map(h -> {
             String date = formatDate(h.getTimestamp());
-            return VirtualChests.getPluginLanguage().get(new Lang.HISTORY_LIST_LINE(number, player, h.getId(), date));
+            return VirtualChests.getPluginLanguage().get(new Lang.HISTORY_LIST_LINE(number, player.getName(), h.getId(), date));
         }).collect(Collectors.joining("<br>"));
 
         return MiniMessage.miniMessage().deserialize(header + "<br>" + lines + "<br>" + footer);

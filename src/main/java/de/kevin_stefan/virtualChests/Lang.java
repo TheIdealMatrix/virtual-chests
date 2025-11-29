@@ -20,7 +20,7 @@ public final class Lang {
     public record HISTORY_LIST_LINE(int number, String player, long id, String date) {
     }
 
-    public record HISTORY_LIST_FOOTER(int number, String player) {
+    public record HISTORY_LIST_FOOTER(int number, String player, int page, int max_page, int prev_page, int next_page) {
     }
 
     public record HISTORY_DATE_FORMAT() {
@@ -30,6 +30,9 @@ public final class Lang {
     }
 
     public record HISTORY_NOT_FOUND(int number, String player) {
+    }
+
+    public record HISTORY_NOT_FOUND_PAGE(int number, String player, int page) {
     }
 
     public record HISTORY_NOT_FOUND_ID(int number, String player, int id) {

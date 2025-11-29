@@ -8,10 +8,15 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 import org.hibernate.cfg.Configuration;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -120,6 +125,35 @@ public class StorageProvider {
             query.setParameter("number", number);
             query.setMaxResults(VirtualChests.getPluginConfig().getInt("keep_last"));
             return query.getResultList();
+        }
+    }
+
+    public List<VirtualChestHistory> getVChestHistory(UUID player, int number, int page) {
+        int pageSize = VirtualChests.getPluginConfig().getInt("history_page_size");
+        int offset = (page - 1) * pageSize;
+        try (EntityManager manager = factory.createEntityManager()) {
+            TypedQuery<VirtualChestHistory> query = manager.createNamedQuery("VirtualChestHistory.get", VirtualChestHistory.class);
+            query.setParameter("player", player);
+            query.setParameter("number", number);
+            query.setFirstResult(offset);
+            query.setMaxResults(pageSize);
+            return query.getResultList();
+        }
+    }
+
+    public long getVChestHistoryCount(UUID player, int number) {
+        try (EntityManager manager = factory.createEntityManager()) {
+            CriteriaBuilder builder = manager.getCriteriaBuilder();
+            CriteriaQuery<Long> query = builder.createQuery(Long.class);
+            Root<VirtualChestHistory> root = query.from(VirtualChestHistory.class);
+
+            List<Predicate> predicates = new ArrayList<>();
+            predicates.add(builder.equal(root.get("player"), player));
+            predicates.add(builder.equal(root.get("number"), number));
+
+            query.select(builder.count(root)).where(builder.and(predicates));
+
+            return manager.createQuery(query).getSingleResult();
         }
     }
 
