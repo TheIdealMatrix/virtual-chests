@@ -82,6 +82,7 @@ public class StorageProvider {
         }
     }
 
+    //region VirtualChest
     public @Nullable VirtualChest getVChest(UUID player, int number) {
         try (EntityManager manager = factory.createEntityManager()) {
             TypedQuery<VirtualChest> query = manager.createNamedQuery("VirtualChest.get", VirtualChest.class);
@@ -108,6 +109,27 @@ public class StorageProvider {
         }
     }
 
+    public long getVChestCount(UUID player, int number) {
+        try (EntityManager manager = factory.createEntityManager()) {
+            CriteriaBuilder builder = manager.getCriteriaBuilder();
+            CriteriaQuery<Long> query = builder.createQuery(Long.class);
+            Root<VirtualChest> root = query.from(VirtualChest.class);
+
+            List<Predicate> predicates = new ArrayList<>();
+            predicates.add(builder.equal(root.get("player"), player));
+            predicates.add(builder.equal(root.get("number"), number));
+
+            query.select(builder.count(root)).where(builder.and(predicates));
+            return manager.createQuery(query).getSingleResult();
+        }
+    }
+
+    public boolean doesVChestExist(UUID player, int number) {
+        return getVChestCount(player, number) > 0;
+    }
+    //endregion
+
+    //region VirtualChestHistory
     public @Nullable VirtualChestHistory getLastVChestHistory(UUID player, int number) {
         try (EntityManager manager = factory.createEntityManager()) {
             TypedQuery<VirtualChestHistory> query = manager.createNamedQuery("VirtualChestHistory.get", VirtualChestHistory.class);
@@ -191,5 +213,6 @@ public class StorageProvider {
             manager.getTransaction().commit();
         }
     }
+    //endregion
 
 }

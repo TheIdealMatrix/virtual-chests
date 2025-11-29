@@ -90,6 +90,11 @@ public final class ChestCommand {
         int number = IntegerArgumentType.getInteger(ctx, "number");
         final Player targetPlayer = ctx.getArgument("player", PlayerSelectorArgumentResolver.class).resolve(ctx.getSource()).getFirst();
 
+        if (!StorageProvider.getInstance().doesVChestExist(targetPlayer.getUniqueId(), number)) {
+            player.sendMessage(VirtualChests.getPluginLanguage().getFormatted(new Lang.NO_CHEST_OTHER(number, targetPlayer.getName())));
+            return Command.SINGLE_SUCCESS;
+        }
+
         player.sendMessage(VirtualChests.getPluginLanguage().getFormatted(new Lang.OPEN_CHEST_OTHER(number, targetPlayer.getName())));
         VCManager.openChest(player, targetPlayer, number);
         return Command.SINGLE_SUCCESS;

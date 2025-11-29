@@ -14,6 +14,9 @@ public final class Lang {
     public record NO_CHEST(int number) {
     }
 
+    public record NO_CHEST_OTHER(int number, String player) {
+    }
+
     public record HISTORY_LIST_HEADER(int number, String player) {
     }
 
