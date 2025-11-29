@@ -145,7 +145,6 @@ public class StorageProvider {
             TypedQuery<VirtualChestHistory> query = manager.createNamedQuery("VirtualChestHistory.get", VirtualChestHistory.class);
             query.setParameter("player", player);
             query.setParameter("number", number);
-            query.setMaxResults(VirtualChests.getPluginConfig().getInt("keep_last"));
             return query.getResultList();
         }
     }
@@ -196,11 +195,14 @@ public class StorageProvider {
 
             manager.persist(vChestHistory);
 
-            Query deleteQuery = manager.createQuery("delete from VirtualChestHistory where player = :player and number = :number and id not in (select id from VirtualChestHistory where player = :player and number = :number order by timestamp desc limit :limit)");
-            deleteQuery.setParameter("player", vChestHistory.getPlayer());
-            deleteQuery.setParameter("number", vChestHistory.getNumber());
-            deleteQuery.setParameter("limit", VirtualChests.getPluginConfig().getInt("keep_last"));
-            deleteQuery.executeUpdate();
+            int keepLast = VirtualChests.getPluginConfig().getInt("keep_last");
+            if (keepLast > 0) {
+                Query deleteQuery = manager.createQuery("delete from VirtualChestHistory where player = :player and number = :number and id not in (select id from VirtualChestHistory where player = :player and number = :number order by timestamp desc limit :limit)");
+                deleteQuery.setParameter("player", vChestHistory.getPlayer());
+                deleteQuery.setParameter("number", vChestHistory.getNumber());
+                deleteQuery.setParameter("limit", keepLast);
+                deleteQuery.executeUpdate();
+            }
 
             manager.getTransaction().commit();
         }

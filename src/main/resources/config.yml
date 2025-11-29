@@ -9,7 +9,7 @@ storage:
     password: "secure-password"
 chest_rows: 6 # 1-6
 command_name: "chest"
-keep_last: 50 # How many history entries to keep (per chest of a player)
+keep_last: 50 # How many history entries to keep (per chest of a player). Can be -1 to keep everything
 history_page_size: 10 # How many entries per history page
 lang:
   PREFIX: "<blue><bold>VirtualChests > </bold></blue>"
