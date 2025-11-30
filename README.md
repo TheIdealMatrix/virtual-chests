@@ -10,6 +10,7 @@ Instead of cluttering the world with physical chests, players can securely store
 * 📂 **Private virtual storage** – No physical chest needed, items are safe from griefers.
 * 🛠️ **Configurable** – Easily manage how many virtual chests players can access.
 * 🤝 **Seamless integration** – Works with existing permission plugins (LuckPerms, PermissionsEx, etc.).
+* 📜 **History & restore system** – View past chest states, preview snapshots, and restore older versions instantly.
 
 ### 🎮 Use Cases
 
@@ -41,6 +42,10 @@ Control access to virtual chests using simple permissions:
 
 * **`/chest <number>`** → Opens your own virtual chest with the given number.
 * **`/chest <number> <player>`** → *(Admin only)* Opens another player’s virtual chest.
+* **`/chest <number> <player> history`** → *(Admin only)* Shows the history for the specified player’s virtual chest.
+* **`/chest <number> <player> history -page <page>`** → *(Admin only)* Displays a specific page of the chest’s history log.
+* **`/chest <number> <player> history <id> view`** → *(Admin only)* Opens a preview of the historical chest snapshot.
+* **`/chest <number> <player> history <id> restore`** → *(Admin only)* Restores the chest to the chosen historical snapshot.
 
 📌 *Note:* The base command `/chest` can be renamed in the `config.yml`.
 
@@ -54,5 +59,9 @@ Control access to virtual chests using simple permissions:
 * Set the **number of rows per chest** (1–6).
 * Rename the **base command** to match your server style.
 * Customize **messages and chest names** to fit your language or formatting preferences.
+* Fully customize all history-related messages, pagination buttons, and date formatting.
+* Control how much history is stored using:
+  * `keep_last`: Number of history entries to keep per chest (`-1` to keep all).
+  * `history_page_size`: Number of entries shown per page in the history command.
 
 📌 *Tip:* The configuration is easy to edit and helps you tailor the plugin for your community.
