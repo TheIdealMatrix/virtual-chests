@@ -2,10 +2,14 @@ package de.kevin_stefan.virtualChests.utils;
 
 import dev.dejvokep.boostedyaml.YamlDocument;
 import dev.dejvokep.boostedyaml.dvs.versioning.BasicVersioning;
+import dev.dejvokep.boostedyaml.libs.org.snakeyaml.engine.v2.common.ScalarStyle;
+import dev.dejvokep.boostedyaml.libs.org.snakeyaml.engine.v2.nodes.Tag;
+import dev.dejvokep.boostedyaml.settings.dumper.DumperSettings;
 import dev.dejvokep.boostedyaml.settings.general.GeneralSettings;
 import dev.dejvokep.boostedyaml.settings.loader.LoaderSettings;
 import dev.dejvokep.boostedyaml.settings.updater.UpdaterSettings;
 import dev.dejvokep.boostedyaml.spigot.SpigotSerializer;
+import dev.dejvokep.boostedyaml.utils.format.NodeRole;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -48,9 +52,15 @@ public abstract class MinecraftPlugin extends JavaPlugin {
         LoaderSettings loaderSettings = LoaderSettings.builder().setAutoUpdate(true).build();
         UpdaterSettings updaterSettings = UpdaterSettings.builder().setVersioning(new BasicVersioning("config-version")).build();
         GeneralSettings generalSettings = GeneralSettings.builder().setSerializer(SpigotSerializer.getInstance()).build();
+        DumperSettings dumperSettings = DumperSettings.builder().setScalarFormatter((tag, value, role, def) -> {
+            if (tag != Tag.STR) {
+                return def;
+            }
+            return role == NodeRole.KEY ? ScalarStyle.PLAIN : ScalarStyle.DOUBLE_QUOTED;
+        }).build();
 
         try {
-            return YamlDocument.create(configFile, defaultConfigStream, loaderSettings, updaterSettings, generalSettings);
+            return YamlDocument.create(configFile, defaultConfigStream, loaderSettings, updaterSettings, generalSettings, dumperSettings);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
