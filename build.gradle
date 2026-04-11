@@ -1,7 +1,7 @@
 plugins {
     id 'java'
-    id("xyz.jpenilla.run-paper") version "2.3.1"
-    id("com.gradleup.shadow") version "8.3.0"
+    id("xyz.jpenilla.run-paper") version "3.0.2"
+    id("com.gradleup.shadow") version "9.4.1"
 }
 
 group = 'de.kevin_stefan'
@@ -20,7 +20,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly("io.papermc.paper:paper-api:1.21.10-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
     compileOnly("org.hibernate.orm:hibernate-core:7.0.0.Final")
     compileOnly("org.hibernate.orm:hibernate-c3p0:7.0.0.Final")
     compileOnly("org.hibernate.orm:hibernate-community-dialects:7.0.0.Final")
