@@ -46,6 +46,9 @@ Control access to virtual chests using simple permissions:
 * **`/chest <number> <player> history -page <page>`** → *(Admin only)* Displays a specific page of the chest’s history log.
 * **`/chest <number> <player> history <id> view`** → *(Admin only)* Opens a preview of the historical chest snapshot.
 * **`/chest <number> <player> history <id> restore`** → *(Admin only)* Restores the chest to the chosen historical snapshot.
+* **`/chest transfer <player_from> <player_to>`** → *(Admin only)* Transfer all Chests.
+* **`/chest transfer <player_from> <player_to> <number>`** → *(Admin only)* Transfer single Chest.
+* **`/chest transfer <player_from> <player_to> <number> <number_dest>`** → *(Admin only)* Transfer single Chest with different destination.
 
 📌 *Note:* The base command `/chest` can be renamed in the `config.yml`.
 
