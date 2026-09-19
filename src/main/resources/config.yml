@@ -1,4 +1,4 @@
-config-version: "2" # <- do not change this line!
+config-version: "3" # <- do not change this line!
 debug: false
 storage:
   type: "sqlite" # sqlite or mysql
@@ -11,6 +11,7 @@ chest_rows: 6 # 1-6
 command_name: "chest"
 keep_last: 50 # How many history entries to keep (per chest of a player). Can be -1 to keep everything
 history_page_size: 10 # How many entries per history page
+transfer_history: true # Should the history be transferred together with chests?
 lang:
   PREFIX: "<blue><bold>VirtualChests > </bold></blue>"
   CHEST_NAME: "<blue>%player% > %number%" # number, player
@@ -27,3 +28,7 @@ lang:
   HISTORY_NOT_FOUND_PAGE: "%prefix%<red>Page %page% not found" # number, player, page
   HISTORY_NOT_FOUND_ID: "%prefix%<red>Could not find Chest History with id %id% for player %player% and chest %number%" # number, player, id
   HISTORY_RESTORED: "%prefix%<green>History #%id% for chest %number% of player %player% restored" # number, player, id, date
+  TRANSFER_OVERWRITE_CONFIRM: "%prefix%<yellow>Player %player% has %count% virtual chests. Do you want to overwrite them? <click:run_command:%command%><hover:show_text:'Click to overwrite'><green>Yes</green></hover></click>" # player, count, command
+  TRANSFER_OVERWRITE_CONFIRM_SINGLE: "%prefix%<yellow>Player %player% has virtual chest number %number%. Do you want to overwrite it? <click:run_command:%command%><hover:show_text:'Click to overwrite'><green>Yes</green></hover></click>" # player, number, command
+  TRANSFER_SUCCESS: "%prefix%<green>Successfully transferred %count% chest(s) from %player_from% to %player_to%" # count, player_from, player_to
+  TRANSFER_ERROR_PLAYER: "%prefix%<red>Target player cannot be the same as the source player when source and target chest number is the same" # player

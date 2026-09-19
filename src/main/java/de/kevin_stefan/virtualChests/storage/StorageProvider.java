@@ -8,10 +8,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Predicate;
-import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.*;
 import org.hibernate.cfg.Configuration;
 import org.jetbrains.annotations.Nullable;
 
@@ -109,7 +106,7 @@ public class StorageProvider {
         }
     }
 
-    public long getVChestCount(UUID player, int number) {
+    public long getVChestCount(UUID player, @Nullable Integer number) {
         try (EntityManager manager = factory.createEntityManager()) {
             CriteriaBuilder builder = manager.getCriteriaBuilder();
             CriteriaQuery<Long> query = builder.createQuery(Long.class);
@@ -117,7 +114,9 @@ public class StorageProvider {
 
             List<Predicate> predicates = new ArrayList<>();
             predicates.add(builder.equal(root.get("player"), player));
-            predicates.add(builder.equal(root.get("number"), number));
+            if (number != null) {
+                predicates.add(builder.equal(root.get("number"), number));
+            }
 
             query.select(builder.count(root)).where(builder.and(predicates));
             return manager.createQuery(query).getSingleResult();
@@ -213,6 +212,94 @@ public class StorageProvider {
             manager.getTransaction().begin();
             manager.remove(vChestHistory);
             manager.getTransaction().commit();
+        }
+    }
+    //endregion
+
+    //region Transfer
+    public int transferChests(UUID player, UUID target, @Nullable Integer number, @Nullable Integer numberTo) {
+        if (number == null && numberTo != null) {
+            throw new IllegalArgumentException("number cannot be null when numberTo is not null");
+        }
+
+        try (EntityManager manager = factory.createEntityManager()) {
+            try {
+                manager.getTransaction().begin();
+
+                // Delete target players chest & history
+                preTransferDelete(manager, target, (numberTo != null) ? numberTo : number);
+
+                // Transfer
+                CriteriaBuilder builderChest = manager.getCriteriaBuilder();
+                CriteriaUpdate<VirtualChest> updateChest = builderChest.createCriteriaUpdate(VirtualChest.class);
+                Root<VirtualChest> rootChest = updateChest.from(VirtualChest.class);
+
+                updateChest.set(rootChest.get("player"), target);
+                List<Predicate> predicatesChest = new ArrayList<>();
+                predicatesChest.add(builderChest.equal(rootChest.get("player"), player));
+                if (number != null) {
+                    predicatesChest.add(builderChest.equal(rootChest.get("number"), number));
+                    if (numberTo != null) {
+                        updateChest.set(rootChest.get("number"), numberTo);
+                    }
+                }
+                updateChest.where(builderChest.and(predicatesChest));
+                int modifiedChests = manager.createQuery(updateChest).executeUpdate();
+
+                if (VirtualChests.getPluginConfig().getBoolean("transfer_history")) {
+                    CriteriaBuilder builderHistory = manager.getCriteriaBuilder();
+                    CriteriaUpdate<VirtualChestHistory> updateHistory = builderHistory.createCriteriaUpdate(VirtualChestHistory.class);
+                    Root<VirtualChestHistory> rootHistory = updateHistory.from(VirtualChestHistory.class);
+
+                    updateHistory.set(rootHistory.get("player"), target);
+                    List<Predicate> predicatesHistory = new ArrayList<>();
+                    predicatesHistory.add(builderHistory.equal(rootHistory.get("player"), player));
+                    if (number != null) {
+                        predicatesHistory.add(builderHistory.equal(rootHistory.get("number"), number));
+                        if (numberTo != null) {
+                            updateHistory.set(rootHistory.get("number"), numberTo);
+                        }
+                    }
+                    updateHistory.where(builderHistory.and(predicatesHistory));
+                    manager.createQuery(updateHistory).executeUpdate();
+                }
+
+                manager.getTransaction().commit();
+                return modifiedChests;
+            } catch (Exception e) {
+                manager.getTransaction().rollback();
+                throw e;
+            }
+        }
+    }
+
+    private void preTransferDelete(EntityManager manager, UUID player, @Nullable Integer number) {
+        // Chest
+        CriteriaBuilder builderChest = manager.getCriteriaBuilder();
+        CriteriaDelete<VirtualChest> deleteChest = builderChest.createCriteriaDelete(VirtualChest.class);
+        Root<VirtualChest> rootChest = deleteChest.from(VirtualChest.class);
+
+        List<Predicate> predicatesChest = new ArrayList<>();
+        predicatesChest.add(builderChest.equal(rootChest.get("player"), player));
+        if (number != null) {
+            predicatesChest.add(builderChest.equal(rootChest.get("number"), number));
+        }
+        deleteChest.where(builderChest.and(predicatesChest));
+        manager.createQuery(deleteChest).executeUpdate();
+
+        // History
+        if (VirtualChests.getPluginConfig().getBoolean("transfer_history")) {
+            CriteriaBuilder builderHistory = manager.getCriteriaBuilder();
+            CriteriaDelete<VirtualChestHistory> deleteHistory = builderHistory.createCriteriaDelete(VirtualChestHistory.class);
+            Root<VirtualChestHistory> rootHistory = deleteHistory.from(VirtualChestHistory.class);
+
+            List<Predicate> predicatesHistory = new ArrayList<>();
+            predicatesHistory.add(builderHistory.equal(rootHistory.get("player"), player));
+            if (number != null) {
+                predicatesHistory.add(builderHistory.equal(rootHistory.get("number"), number));
+            }
+            deleteHistory.where(builderHistory.and(predicatesHistory));
+            manager.createQuery(deleteHistory).executeUpdate();
         }
     }
     //endregion

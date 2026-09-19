@@ -44,4 +44,16 @@ public final class Lang {
     public record HISTORY_RESTORED(int number, String player, int id, String date) {
     }
 
+    public record TRANSFER_OVERWRITE_CONFIRM(String player, long count, String command) {
+    }
+
+    public record TRANSFER_OVERWRITE_CONFIRM_SINGLE(String player, int number, String command) {
+    }
+
+    public record TRANSFER_SUCCESS(long count, String player_from, String player_to) {
+    }
+
+    public record TRANSFER_ERROR_PLAYER(String player) {
+    }
+
 }

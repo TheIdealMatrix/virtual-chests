@@ -24,13 +24,19 @@ import org.bukkit.inventory.Inventory;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public final class ChestCommand {
 
+    private static final String COMMAND_NAME = VirtualChests.getPluginConfig().getString("command_name");
+
+    private static final HashSet<Integer> pendingConfirms = new HashSet<>();
+
     public static LiteralCommandNode<CommandSourceStack> build() {
-        return Commands.literal(VirtualChests.getPluginConfig().getString("command_name"))
+        return Commands.literal(COMMAND_NAME)
             .then(Commands.argument("number", IntegerArgumentType.integer(1))
                 .requires(source -> source.getSender().hasPermission("virtualchests.use"))
                 .executes(ctx -> handlePlayerOnly(ctx, ChestCommand::runOpenCommand))
@@ -54,6 +60,20 @@ public final class ChestCommand {
                             )
                             .then(Commands.literal("restore")
                                 .executes(ctx -> handlePlayerOnly(ctx, ChestCommand::runRestoreHistory))
+                            )
+                        )
+                    )
+                )
+            )
+            .then(Commands.literal("transfer")
+                .requires(source -> source.getSender().hasPermission("virtualchests.admin"))
+                .then(Commands.argument("player_from", ArgumentTypes.player())
+                    .then(Commands.argument("player_to", ArgumentTypes.player())
+                        .executes(ChestCommand::runTransferChests)
+                        .then(Commands.argument("number", IntegerArgumentType.integer())
+                            .executes(ChestCommand::runTransferChest)
+                            .then(Commands.argument("number_dest", IntegerArgumentType.integer())
+                                .executes(ChestCommand::runTransferChestWithDestination)
                             )
                         )
                     )
@@ -191,6 +211,105 @@ public final class ChestCommand {
         }).collect(Collectors.joining("<br>"));
 
         return MiniMessage.miniMessage().deserialize(header + "<br>" + lines + "<br>" + footer);
+    }
+
+    private static int runTransferChests(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
+        final Player playerFrom = ctx.getArgument("player_from", PlayerSelectorArgumentResolver.class).resolve(ctx.getSource()).getFirst();
+        final Player playerTo = ctx.getArgument("player_to", PlayerSelectorArgumentResolver.class).resolve(ctx.getSource()).getFirst();
+
+        if (playerFrom.getUniqueId().equals(playerTo.getUniqueId())) {
+            Component message = VirtualChests.getPluginLanguage().getFormatted(new Lang.TRANSFER_ERROR_PLAYER(playerFrom.getName()));
+            ctx.getSource().getSender().sendMessage(message);
+            return Command.SINGLE_SUCCESS;
+        }
+
+        int hashCode = Objects.hash(ctx.getSource().getSender().getName(), playerFrom.getUniqueId(), playerTo.getUniqueId());
+        if (!pendingConfirms.contains(hashCode)) {
+            long count = StorageProvider.getInstance().getVChestCount(playerTo.getUniqueId(), null);
+            if (count > 0) {
+                pendingConfirms.add(hashCode);
+                Bukkit.getScheduler().runTaskLater(VirtualChests.getInstance(), () -> pendingConfirms.remove(hashCode), 20 * 30);
+                String command = String.format("/%s transfer %s %s", COMMAND_NAME, playerFrom.getName(), playerTo.getName());
+                Component message = VirtualChests.getPluginLanguage().getFormatted(new Lang.TRANSFER_OVERWRITE_CONFIRM(playerTo.getName(), count, command));
+                ctx.getSource().getSender().sendMessage(message);
+                return Command.SINGLE_SUCCESS;
+            }
+        } else {
+            pendingConfirms.remove(hashCode);
+        }
+
+        int transferCount = StorageProvider.getInstance().transferChests(playerFrom.getUniqueId(), playerTo.getUniqueId(), null, null);
+        Component message = VirtualChests.getPluginLanguage().getFormatted(new Lang.TRANSFER_SUCCESS(transferCount, playerFrom.getName(), playerTo.getName()));
+        ctx.getSource().getSender().sendMessage(message);
+
+        return Command.SINGLE_SUCCESS;
+    }
+
+    private static int runTransferChest(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
+        final Player playerFrom = ctx.getArgument("player_from", PlayerSelectorArgumentResolver.class).resolve(ctx.getSource()).getFirst();
+        final Player playerTo = ctx.getArgument("player_to", PlayerSelectorArgumentResolver.class).resolve(ctx.getSource()).getFirst();
+        int number = IntegerArgumentType.getInteger(ctx, "number");
+
+        if (playerFrom.getUniqueId().equals(playerTo.getUniqueId())) {
+            Component message = VirtualChests.getPluginLanguage().getFormatted(new Lang.TRANSFER_ERROR_PLAYER(playerFrom.getName()));
+            ctx.getSource().getSender().sendMessage(message);
+            return Command.SINGLE_SUCCESS;
+        }
+
+        int hashCode = Objects.hash(ctx.getSource().getSender().getName(), playerFrom.getUniqueId(), playerTo.getUniqueId(), number);
+        if (!pendingConfirms.contains(hashCode)) {
+            boolean overwriteNeeded = StorageProvider.getInstance().doesVChestExist(playerTo.getUniqueId(), number);
+            if (overwriteNeeded) {
+                pendingConfirms.add(hashCode);
+                Bukkit.getScheduler().runTaskLater(VirtualChests.getInstance(), () -> pendingConfirms.remove(hashCode), 20 * 30);
+                String command = String.format("/%s transfer %s %s %s", COMMAND_NAME, playerFrom.getName(), playerTo.getName(), number);
+                Component message = VirtualChests.getPluginLanguage().getFormatted(new Lang.TRANSFER_OVERWRITE_CONFIRM_SINGLE(playerTo.getName(), number, command));
+                ctx.getSource().getSender().sendMessage(message);
+                return Command.SINGLE_SUCCESS;
+            }
+        } else {
+            pendingConfirms.remove(hashCode);
+        }
+
+        StorageProvider.getInstance().transferChests(playerFrom.getUniqueId(), playerTo.getUniqueId(), number, null);
+        Component message = VirtualChests.getPluginLanguage().getFormatted(new Lang.TRANSFER_SUCCESS(1, playerFrom.getName(), playerTo.getName()));
+        ctx.getSource().getSender().sendMessage(message);
+
+        return Command.SINGLE_SUCCESS;
+    }
+
+    private static int runTransferChestWithDestination(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
+        final Player playerFrom = ctx.getArgument("player_from", PlayerSelectorArgumentResolver.class).resolve(ctx.getSource()).getFirst();
+        final Player playerTo = ctx.getArgument("player_to", PlayerSelectorArgumentResolver.class).resolve(ctx.getSource()).getFirst();
+        int number = IntegerArgumentType.getInteger(ctx, "number");
+        int numberDestination = IntegerArgumentType.getInteger(ctx, "number_dest");
+
+        if (playerFrom.getUniqueId().equals(playerTo.getUniqueId()) && number == numberDestination) {
+            Component message = VirtualChests.getPluginLanguage().getFormatted(new Lang.TRANSFER_ERROR_PLAYER(playerFrom.getName()));
+            ctx.getSource().getSender().sendMessage(message);
+            return Command.SINGLE_SUCCESS;
+        }
+
+        int hashCode = Objects.hash(ctx.getSource().getSender().getName(), playerFrom.getUniqueId(), playerTo.getUniqueId(), number, numberDestination);
+        if (!pendingConfirms.contains(hashCode)) {
+            boolean overwriteNeeded = StorageProvider.getInstance().doesVChestExist(playerTo.getUniqueId(), numberDestination);
+            if (overwriteNeeded) {
+                pendingConfirms.add(hashCode);
+                Bukkit.getScheduler().runTaskLater(VirtualChests.getInstance(), () -> pendingConfirms.remove(hashCode), 20 * 30);
+                String command = String.format("/%s transfer %s %s %s %s", COMMAND_NAME, playerFrom.getName(), playerTo.getName(), number, numberDestination);
+                Component message = VirtualChests.getPluginLanguage().getFormatted(new Lang.TRANSFER_OVERWRITE_CONFIRM_SINGLE(playerTo.getName(), numberDestination, command));
+                ctx.getSource().getSender().sendMessage(message);
+                return Command.SINGLE_SUCCESS;
+            }
+        } else {
+            pendingConfirms.remove(hashCode);
+        }
+
+        StorageProvider.getInstance().transferChests(playerFrom.getUniqueId(), playerTo.getUniqueId(), number, numberDestination);
+        Component message = VirtualChests.getPluginLanguage().getFormatted(new Lang.TRANSFER_SUCCESS(1, playerFrom.getName(), playerTo.getName()));
+        ctx.getSource().getSender().sendMessage(message);
+
+        return Command.SINGLE_SUCCESS;
     }
 
 }
