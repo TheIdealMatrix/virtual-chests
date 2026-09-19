@@ -288,17 +288,19 @@ public class StorageProvider {
         manager.createQuery(deleteChest).executeUpdate();
 
         // History
-        CriteriaBuilder builderHistory = manager.getCriteriaBuilder();
-        CriteriaDelete<VirtualChestHistory> deleteHistory = builderHistory.createCriteriaDelete(VirtualChestHistory.class);
-        Root<VirtualChestHistory> rootHistory = deleteHistory.from(VirtualChestHistory.class);
+        if (VirtualChests.getPluginConfig().getBoolean("transfer_history")) {
+            CriteriaBuilder builderHistory = manager.getCriteriaBuilder();
+            CriteriaDelete<VirtualChestHistory> deleteHistory = builderHistory.createCriteriaDelete(VirtualChestHistory.class);
+            Root<VirtualChestHistory> rootHistory = deleteHistory.from(VirtualChestHistory.class);
 
-        List<Predicate> predicatesHistory = new ArrayList<>();
-        predicatesHistory.add(builderHistory.equal(rootHistory.get("player"), player));
-        if (number != null) {
-            predicatesHistory.add(builderHistory.equal(rootHistory.get("number"), number));
+            List<Predicate> predicatesHistory = new ArrayList<>();
+            predicatesHistory.add(builderHistory.equal(rootHistory.get("player"), player));
+            if (number != null) {
+                predicatesHistory.add(builderHistory.equal(rootHistory.get("number"), number));
+            }
+            deleteHistory.where(builderHistory.and(predicatesHistory));
+            manager.createQuery(deleteHistory).executeUpdate();
         }
-        deleteHistory.where(builderHistory.and(predicatesHistory));
-        manager.createQuery(deleteHistory).executeUpdate();
     }
     //endregion
 

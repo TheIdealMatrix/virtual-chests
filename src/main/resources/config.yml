@@ -11,7 +11,7 @@ chest_rows: 6 # 1-6
 command_name: "chest"
 keep_last: 50 # How many history entries to keep (per chest of a player). Can be -1 to keep everything
 history_page_size: 10 # How many entries per history page
-transfer_history: true
+transfer_history: true # Should the history be transferred together with chests?
 lang:
   PREFIX: "<blue><bold>VirtualChests > </bold></blue>"
   CHEST_NAME: "<blue>%player% > %number%" # number, player
