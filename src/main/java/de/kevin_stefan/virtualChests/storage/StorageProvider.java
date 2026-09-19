@@ -227,7 +227,7 @@ public class StorageProvider {
                 manager.getTransaction().begin();
 
                 // Delete target players chest & history
-                preTransferDelete(manager, target, numberTo);
+                preTransferDelete(manager, target, (numberTo != null) ? numberTo : number);
 
                 // Transfer
                 CriteriaBuilder builderChest = manager.getCriteriaBuilder();
