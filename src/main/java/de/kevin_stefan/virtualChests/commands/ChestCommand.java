@@ -23,6 +23,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -32,53 +33,62 @@ import java.util.stream.Collectors;
 public final class ChestCommand {
 
     private static final String COMMAND_NAME = VirtualChests.getPluginConfig().getString("command_name");
+    private static LiteralCommandNode<CommandSourceStack> command;
 
     private static final HashSet<Integer> pendingConfirms = new HashSet<>();
 
-    public static LiteralCommandNode<CommandSourceStack> build() {
+    public static LiteralCommandNode<CommandSourceStack> getCommand() {
+        if (command == null) {
+            command = build();
+        }
+        return command;
+    }
+
+    private static LiteralCommandNode<CommandSourceStack> build() {
         return Commands.literal(COMMAND_NAME)
-            .then(Commands.argument("number", IntegerArgumentType.integer(1))
                 .requires(source -> source.getSender().hasPermission("virtualchests.use"))
-                .executes(ctx -> handlePlayerOnly(ctx, ChestCommand::runOpenCommand))
-                .then(Commands.argument("player", ArgumentTypes.player())
-                    .requires(source -> source.getSender().hasPermission("virtualchests.admin"))
-                    .suggests((ctx, builder) -> {
-                        Bukkit.getOnlinePlayers().forEach(player -> builder.suggest(player.getName()));
-                        return builder.buildFuture();
-                    })
-                    .executes(ctx -> handlePlayerOnly(ctx, ChestCommand::runOpenOtherCommand))
-                    .then(Commands.literal("history")
-                        .executes(ctx -> handlePlayerOnly(ctx, ChestCommand::runShowHistoryList))
-                        .then(Commands.literal("-page")
-                            .then(Commands.argument("page", IntegerArgumentType.integer(1))
-                                .executes(ctx -> handlePlayerOnly(ctx, ChestCommand::runShowHistoryList))
-                            )
+                .executes(ChestCommand::runHelp)
+                .then(Commands.argument("number", IntegerArgumentType.integer(1))
+                        .executes(ctx -> handlePlayerOnly(ctx, ChestCommand::runOpenCommand))
+                        .then(Commands.argument("player", ArgumentTypes.player())
+                                .requires(source -> source.getSender().hasPermission("virtualchests.admin"))
+                                .suggests((ctx, builder) -> {
+                                    Bukkit.getOnlinePlayers().forEach(player -> builder.suggest(player.getName()));
+                                    return builder.buildFuture();
+                                })
+                                .executes(ctx -> handlePlayerOnly(ctx, ChestCommand::runOpenOtherCommand))
+                                .then(Commands.literal("history")
+                                        .executes(ctx -> handlePlayerOnly(ctx, ChestCommand::runShowHistoryList))
+                                        .then(Commands.literal("-page")
+                                                .then(Commands.argument("page", IntegerArgumentType.integer(1))
+                                                        .executes(ctx -> handlePlayerOnly(ctx, ChestCommand::runShowHistoryList))
+                                                )
+                                        )
+                                        .then(Commands.argument("id", IntegerArgumentType.integer())
+                                                .then(Commands.literal("view")
+                                                        .executes(ctx -> handlePlayerOnly(ctx, ChestCommand::runViewHistory))
+                                                )
+                                                .then(Commands.literal("restore")
+                                                        .executes(ctx -> handlePlayerOnly(ctx, ChestCommand::runRestoreHistory))
+                                                )
+                                        )
+                                )
                         )
-                        .then(Commands.argument("id", IntegerArgumentType.integer())
-                            .then(Commands.literal("view")
-                                .executes(ctx -> handlePlayerOnly(ctx, ChestCommand::runViewHistory))
-                            )
-                            .then(Commands.literal("restore")
-                                .executes(ctx -> handlePlayerOnly(ctx, ChestCommand::runRestoreHistory))
-                            )
-                        )
-                    )
                 )
-            )
-            .then(Commands.literal("transfer")
-                .requires(source -> source.getSender().hasPermission("virtualchests.admin"))
-                .then(Commands.argument("player_from", ArgumentTypes.player())
-                    .then(Commands.argument("player_to", ArgumentTypes.player())
-                        .executes(ChestCommand::runTransferChests)
-                        .then(Commands.argument("number", IntegerArgumentType.integer())
-                            .executes(ChestCommand::runTransferChest)
-                            .then(Commands.argument("number_dest", IntegerArgumentType.integer())
-                                .executes(ChestCommand::runTransferChestWithDestination)
-                            )
+                .then(Commands.literal("transfer")
+                        .requires(source -> source.getSender().hasPermission("virtualchests.admin"))
+                        .then(Commands.argument("player_from", ArgumentTypes.player())
+                                .then(Commands.argument("player_to", ArgumentTypes.player())
+                                        .executes(ChestCommand::runTransferChests)
+                                        .then(Commands.argument("number", IntegerArgumentType.integer())
+                                                .executes(ChestCommand::runTransferChest)
+                                                .then(Commands.argument("number_dest", IntegerArgumentType.integer())
+                                                        .executes(ChestCommand::runTransferChestWithDestination)
+                                                )
+                                        )
+                                )
                         )
-                    )
-                )
-            ).build();
+                ).build();
     }
 
     private interface PlayerOnlyCommand {
@@ -92,6 +102,27 @@ public final class ChestCommand {
             return Command.SINGLE_SUCCESS;
         }
         return command.run(ctx, player);
+    }
+
+    private static int runHelp(CommandContext<CommandSourceStack> ctx) {
+        String header = VirtualChests.getPluginLanguage().get(new Lang.HELP_HEADER());
+        String footer = VirtualChests.getPluginLanguage().get(new Lang.HELP_FOOTER());
+
+        String[] usages = VirtualChests.getInstance().getCommandDispatcher().getAllUsage(getCommand(), ctx.getSource(), true);
+        String rawMessage = Arrays.stream(usages).map(usage -> {
+            String command = "/" + COMMAND_NAME + " " + usage;
+            return VirtualChests.getPluginLanguage().get(new Lang.HELP_LINE(command));
+        }).collect(Collectors.joining("<br>"));
+
+        if (!header.isEmpty()) {
+            rawMessage = header + "<br>" + rawMessage;
+        }
+        if (!footer.isEmpty()) {
+            rawMessage = rawMessage + "<br>" + footer;
+        }
+        Component message = MiniMessage.miniMessage().deserialize(rawMessage);
+        ctx.getSource().getSender().sendMessage(message);
+        return Command.SINGLE_SUCCESS;
     }
 
     private static int runOpenCommand(CommandContext<CommandSourceStack> ctx, Player player) {

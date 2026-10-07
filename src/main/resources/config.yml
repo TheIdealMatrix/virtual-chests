@@ -1,4 +1,4 @@
-config-version: "3" # <- do not change this line!
+config-version: "4" # <- do not change this line!
 debug: false
 storage:
   type: "sqlite" # sqlite or mysql
@@ -32,3 +32,6 @@ lang:
   TRANSFER_OVERWRITE_CONFIRM_SINGLE: "%prefix%<yellow>Player %player% has virtual chest number %number%. Do you want to overwrite it? <click:run_command:%command%><hover:show_text:'Click to overwrite'><green>Yes</green></hover></click>" # player, number, command
   TRANSFER_SUCCESS: "%prefix%<green>Successfully transferred %count% chest(s) from %player_from% to %player_to%" # count, player_from, player_to
   TRANSFER_ERROR_PLAYER: "%prefix%<red>Target player cannot be the same as the source player when source and target chest number is the same" # player
+  HELP_HEADER: "%prefix%<green>Commands:"
+  HELP_LINE: "<gray>></gray> %command%" # command
+  HELP_FOOTER: "<gray>Note: Only commands for which you have permission are displayed"

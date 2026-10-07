@@ -56,4 +56,13 @@ public final class Lang {
     public record TRANSFER_ERROR_PLAYER(String player) {
     }
 
+    public record HELP_HEADER() {
+    }
+
+    public record HELP_LINE(String command) {
+    }
+
+    public record HELP_FOOTER() {
+    }
+
 }
