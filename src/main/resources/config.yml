@@ -1,5 +1,6 @@
-config-version: "3" # <- do not change this line!
+config-version: "4" # <- do not change this line!
 debug: false
+update_notifier: true
 storage:
   type: "sqlite" # sqlite or mysql
   mysql:
@@ -14,9 +15,10 @@ history_page_size: 10 # How many entries per history page
 transfer_history: true # Should the history be transferred together with chests?
 lang:
   PREFIX: "<blue><bold>VirtualChests > </bold></blue>"
+  UPDATE: "%prefix%<gold>There is a newer version available: <green>%newVersion%</green>, you're on: <green>%currentVersion%</green>" # newVersion, currentVersion
   CHEST_NAME: "<blue>%player% > %number%" # number, player
   OPEN_CHEST: "%prefix%<green>Opening Chest %number%..." # number
-  OPEN_CHEST_OTHER: "%prefix%<green>Opening Chest %number% of %player%..." #  # number, player
+  OPEN_CHEST_OTHER: "%prefix%<green>Opening Chest %number% of %player%..." # number, player
   NO_CHEST: "%prefix%<red>You don't own Chest %number%" # number
   NO_CHEST_OTHER: "%prefix%<red>%player% doesn't have Chest %number% or it's empty" # number, player
   HISTORY_LIST_HEADER: "%prefix%<green>Chest %number% History of %player%:</green>" # number, player
@@ -32,3 +34,6 @@ lang:
   TRANSFER_OVERWRITE_CONFIRM_SINGLE: "%prefix%<yellow>Player %player% has virtual chest number %number%. Do you want to overwrite it? <click:run_command:%command%><hover:show_text:'Click to overwrite'><green>Yes</green></hover></click>" # player, number, command
   TRANSFER_SUCCESS: "%prefix%<green>Successfully transferred %count% chest(s) from %player_from% to %player_to%" # count, player_from, player_to
   TRANSFER_ERROR_PLAYER: "%prefix%<red>Target player cannot be the same as the source player when source and target chest number is the same" # player
+  HELP_HEADER: "%prefix%<green>Commands:"
+  HELP_LINE: "<gray>></gray> %command%" # command
+  HELP_FOOTER: "<gray>Note: Only commands for which you have permission are displayed"

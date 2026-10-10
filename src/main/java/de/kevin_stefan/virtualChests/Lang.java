@@ -2,6 +2,9 @@ package de.kevin_stefan.virtualChests;
 
 public final class Lang {
 
+    public record UPDATE(String newVersion, String currentVersion) {
+    }
+
     public record CHEST_NAME(String player, int number) {
     }
 
@@ -54,6 +57,15 @@ public final class Lang {
     }
 
     public record TRANSFER_ERROR_PLAYER(String player) {
+    }
+
+    public record HELP_HEADER() {
+    }
+
+    public record HELP_LINE(String command) {
+    }
+
+    public record HELP_FOOTER() {
     }
 
 }
