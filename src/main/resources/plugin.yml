@@ -14,6 +14,7 @@ permissions:
   virtualchests.admin:
     children:
       virtualchests.use: true
+      virtualchests.update: true
   virtualchests.multiple.3:
     children:
       virtualchests.open.1: true
