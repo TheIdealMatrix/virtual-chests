@@ -33,6 +33,7 @@ Control access to virtual chests using simple permissions:
 * **`virtualchests.multiple.5`** → Grants access to chests **1–5**.
 * **`virtualchests.multiple.10`** → Grants access to chests **1–10**.
 * **`virtualchests.admin`** → Allows admins to open other player's virtual chests.
+* **`virtualchests.update`** → Get update notification on join
 
 👉 Example: If you want players to have **five private chests**, simply give them `virtualchests.multiple.5`.
 
@@ -40,6 +41,7 @@ Control access to virtual chests using simple permissions:
 
 ### 📝 Commands
 
+* **`/chest`** → Lists all commands
 * **`/chest <number>`** → Opens your own virtual chest with the given number.
 * **`/chest <number> <player>`** → *(Admin only)* Opens another player’s virtual chest.
 * **`/chest <number> <player> history`** → *(Admin only)* Shows the history for the specified player’s virtual chest.
