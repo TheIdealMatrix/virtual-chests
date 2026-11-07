@@ -24,6 +24,7 @@ jobs:
       - name: build
         run: ./gradlew build
         env:
+          GITHUB_USERNAME: ${{ vars.USERNAME }}
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
       - name: capture build artifacts
         uses: actions/upload-artifact@v7
