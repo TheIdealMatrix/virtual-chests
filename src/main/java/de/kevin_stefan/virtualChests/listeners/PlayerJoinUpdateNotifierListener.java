@@ -26,7 +26,7 @@ public class PlayerJoinUpdateNotifierListener implements Listener {
             return;
         }
 
-        event.getPlayer().sendMessage(VirtualChests.getPluginLanguage().getFormatted(new Lang.UPDATE(newVersion, projectVersion)));
+        event.getPlayer().sendMessage(VirtualChests.getLanguage().getFormatted(new Lang.UPDATE(newVersion, projectVersion)));
     }
 
 }

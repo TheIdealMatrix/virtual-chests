@@ -25,7 +25,7 @@ public class VCManager {
 
     public static void openChest(Player player, OfflinePlayer targetPlayer, int number) {
         if (!openChests.containsKey(targetPlayer.getUniqueId())) {
-            Component title = VirtualChests.getPluginLanguage().getFormatted(new Lang.CHEST_NAME(targetPlayer.getName(), number));
+            Component title = VirtualChests.getLanguage().getFormatted(new Lang.CHEST_NAME(targetPlayer.getName(), number));
 
             Inventory inventory;
             VirtualChest virtualChest = StorageProvider.getInstance().getVChest(targetPlayer.getUniqueId(), number);
@@ -64,7 +64,7 @@ public class VCManager {
             if (savedVChest != null) {
                 viewInfo.virtualChest = savedVChest;
             } else {
-                VirtualChests.getPluginLogger().severe("Unexpected error occurred: Could not save VirtualChest");
+                VirtualChests.getSharedLogger().severe("Unexpected error occurred: Could not save VirtualChest");
             }
         }
 

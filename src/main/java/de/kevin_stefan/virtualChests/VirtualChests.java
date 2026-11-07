@@ -1,17 +1,17 @@
 package de.kevin_stefan.virtualChests;
 
 import com.mojang.brigadier.CommandDispatcher;
+import de.kevin_stefan.minecraft.shared.common.UpdateNotifier;
+import de.kevin_stefan.minecraft.shared.paper.SharedPaperPlugin;
 import de.kevin_stefan.virtualChests.commands.ChestCommand;
 import de.kevin_stefan.virtualChests.listeners.InventoryCloseListener;
 import de.kevin_stefan.virtualChests.listeners.PlayerJoinUpdateNotifierListener;
 import de.kevin_stefan.virtualChests.storage.StorageProvider;
-import de.kevin_stefan.virtualChests.utils.MinecraftPlugin;
-import de.kevin_stefan.virtualChests.utils.UpdateNotifier;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import org.bstats.bukkit.Metrics;
 
-public final class VirtualChests extends MinecraftPlugin {
+public final class VirtualChests extends SharedPaperPlugin {
 
     private static VirtualChests instance;
     private CommandDispatcher<CommandSourceStack> commandDispatcher;

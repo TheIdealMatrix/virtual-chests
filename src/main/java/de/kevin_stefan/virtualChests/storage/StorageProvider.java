@@ -23,13 +23,13 @@ public class StorageProvider {
     private final EntityManagerFactory factory;
 
     private StorageProvider() {
-        VirtualChests.getPluginLogger().info("Loading Storage...");
+        VirtualChests.getSharedLogger().info("Loading Storage...");
 
         Configuration dbConfig = new Configuration();
         YamlDocument config = VirtualChests.getPluginConfig();
         String storageType = config.getString("storage.type", "sqlite");
         if (storageType.equalsIgnoreCase("mysql")) {
-            VirtualChests.getPluginLogger().info("using MySQL");
+            VirtualChests.getSharedLogger().info("using MySQL");
 
             String address = config.getString("storage.mysql.address");
             String database = config.getString("storage.mysql.database");
@@ -41,7 +41,7 @@ public class StorageProvider {
             dbConfig.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQLDialect");
             dbConfig.setProperty("hibernate.connection.driver_class", "com.mysql.jdbc.Driver");
         } else {
-            VirtualChests.getPluginLogger().info("using SQLite");
+            VirtualChests.getSharedLogger().info("using SQLite");
 
             dbConfig.setJdbcUrl("jdbc:sqlite:" + new File(VirtualChests.getInstance().getDataFolder(), "data.db"));
             dbConfig.setProperty("hibernate.dialect", "org.hibernate.community.dialect.SQLiteDialect");
@@ -51,7 +51,7 @@ public class StorageProvider {
         dbConfig.setProperty("hibernate.hbm2ddl.auto", "update");
         dbConfig.setProperty("hibernate.c3p0.min_size", 1);
         dbConfig.setProperty("hibernate.c3p0.max_size", 10);
-        dbConfig.setProperty("hibernate.show_sql", VirtualChests.getPluginLogger().isDebug());
+        dbConfig.setProperty("hibernate.show_sql", VirtualChests.getSharedLogger().isDebug());
 
         Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
         dbConfig.addAnnotatedClass(VirtualChest.class);

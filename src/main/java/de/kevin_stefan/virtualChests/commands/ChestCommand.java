@@ -105,13 +105,13 @@ public final class ChestCommand {
     }
 
     private static int runHelp(CommandContext<CommandSourceStack> ctx) {
-        String header = VirtualChests.getPluginLanguage().get(new Lang.HELP_HEADER());
-        String footer = VirtualChests.getPluginLanguage().get(new Lang.HELP_FOOTER());
+        String header = VirtualChests.getLanguage().get(new Lang.HELP_HEADER());
+        String footer = VirtualChests.getLanguage().get(new Lang.HELP_FOOTER());
 
         String[] usages = VirtualChests.getInstance().getCommandDispatcher().getAllUsage(getCommand(), ctx.getSource(), true);
         String rawMessage = Arrays.stream(usages).map(usage -> {
             String command = "/" + COMMAND_NAME + " " + usage;
-            return VirtualChests.getPluginLanguage().get(new Lang.HELP_LINE(command));
+            return VirtualChests.getLanguage().get(new Lang.HELP_LINE(command));
         }).collect(Collectors.joining("<br>"));
 
         if (!header.isEmpty()) {
@@ -128,11 +128,11 @@ public final class ChestCommand {
     private static int runOpenCommand(CommandContext<CommandSourceStack> ctx, Player player) {
         int number = IntegerArgumentType.getInteger(ctx, "number");
         if (!player.hasPermission("virtualchests.open." + number)) {
-            player.sendMessage(VirtualChests.getPluginLanguage().getFormatted(new Lang.NO_CHEST(number)));
+            player.sendMessage(VirtualChests.getLanguage().getFormatted(new Lang.NO_CHEST(number)));
             return Command.SINGLE_SUCCESS;
         }
 
-        player.sendMessage(VirtualChests.getPluginLanguage().getFormatted(new Lang.OPEN_CHEST(number)));
+        player.sendMessage(VirtualChests.getLanguage().getFormatted(new Lang.OPEN_CHEST(number)));
         VCManager.openChest(player, player, number);
         return Command.SINGLE_SUCCESS;
     }
@@ -142,11 +142,11 @@ public final class ChestCommand {
         final Player targetPlayer = ctx.getArgument("player", PlayerSelectorArgumentResolver.class).resolve(ctx.getSource()).getFirst();
 
         if (!StorageProvider.getInstance().doesVChestExist(targetPlayer.getUniqueId(), number)) {
-            player.sendMessage(VirtualChests.getPluginLanguage().getFormatted(new Lang.NO_CHEST_OTHER(number, targetPlayer.getName())));
+            player.sendMessage(VirtualChests.getLanguage().getFormatted(new Lang.NO_CHEST_OTHER(number, targetPlayer.getName())));
             return Command.SINGLE_SUCCESS;
         }
 
-        player.sendMessage(VirtualChests.getPluginLanguage().getFormatted(new Lang.OPEN_CHEST_OTHER(number, targetPlayer.getName())));
+        player.sendMessage(VirtualChests.getLanguage().getFormatted(new Lang.OPEN_CHEST_OTHER(number, targetPlayer.getName())));
         VCManager.openChest(player, targetPlayer, number);
         return Command.SINGLE_SUCCESS;
     }
@@ -163,11 +163,11 @@ public final class ChestCommand {
         List<VirtualChestHistory> history = StorageProvider.getInstance().getVChestHistory(targetPlayer.getUniqueId(), number, page);
         if (history.isEmpty()) {
             if (page != 1) {
-                Component message = VirtualChests.getPluginLanguage().getFormatted(new Lang.HISTORY_NOT_FOUND_PAGE(number, targetPlayer.getName(), page));
+                Component message = VirtualChests.getLanguage().getFormatted(new Lang.HISTORY_NOT_FOUND_PAGE(number, targetPlayer.getName(), page));
                 player.sendMessage(message);
                 return Command.SINGLE_SUCCESS;
             }
-            Component message = VirtualChests.getPluginLanguage().getFormatted(new Lang.HISTORY_NOT_FOUND(number, targetPlayer.getName()));
+            Component message = VirtualChests.getLanguage().getFormatted(new Lang.HISTORY_NOT_FOUND(number, targetPlayer.getName()));
             player.sendMessage(message);
             return Command.SINGLE_SUCCESS;
         }
@@ -183,12 +183,12 @@ public final class ChestCommand {
 
         VirtualChestHistory history = StorageProvider.getInstance().getVChestHistory(id, targetPlayer.getUniqueId(), number);
         if (history == null) {
-            Component message = VirtualChests.getPluginLanguage().getFormatted(new Lang.HISTORY_NOT_FOUND_ID(number, targetPlayer.getName(), id));
+            Component message = VirtualChests.getLanguage().getFormatted(new Lang.HISTORY_NOT_FOUND_ID(number, targetPlayer.getName(), id));
             player.sendMessage(message);
             return Command.SINGLE_SUCCESS;
         }
         var lang = new Lang.HISTORY_CHEST_NAME(number, targetPlayer.getName(), id, formatDate(history.getTimestamp()));
-        Component title = VirtualChests.getPluginLanguage().getFormatted(lang);
+        Component title = VirtualChests.getLanguage().getFormatted(lang);
         Inventory inventory = VCManager.createVChestInventory(title, history.getContent());
         player.openInventory(inventory);
         return Command.SINGLE_SUCCESS;
@@ -201,7 +201,7 @@ public final class ChestCommand {
 
         VirtualChestHistory history = StorageProvider.getInstance().getVChestHistory(id, targetPlayer.getUniqueId(), number);
         if (history == null) {
-            Component message = VirtualChests.getPluginLanguage().getFormatted(new Lang.HISTORY_NOT_FOUND_ID(number, targetPlayer.getName(), id));
+            Component message = VirtualChests.getLanguage().getFormatted(new Lang.HISTORY_NOT_FOUND_ID(number, targetPlayer.getName(), id));
             player.sendMessage(message);
             return Command.SINGLE_SUCCESS;
         }
@@ -218,13 +218,13 @@ public final class ChestCommand {
         VCManager.addHistory(targetPlayer.getUniqueId(), number, history.getContent());
 
         var lang = new Lang.HISTORY_RESTORED(number, targetPlayer.getName(), id, formatDate(history.getTimestamp()));
-        Component message = VirtualChests.getPluginLanguage().getFormatted(lang);
+        Component message = VirtualChests.getLanguage().getFormatted(lang);
         player.sendMessage(message);
         return Command.SINGLE_SUCCESS;
     }
 
     private static String formatDate(long timestamp) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat(VirtualChests.getPluginLanguage().get(new Lang.HISTORY_DATE_FORMAT()));
+        SimpleDateFormat dateFormat = new SimpleDateFormat(VirtualChests.getLanguage().get(new Lang.HISTORY_DATE_FORMAT()));
         return dateFormat.format(new Date(timestamp));
     }
 
@@ -233,12 +233,12 @@ public final class ChestCommand {
         int pageSize = VirtualChests.getPluginConfig().getInt("history_page_size");
         int maxPage = Math.ceilDiv(Math.toIntExact(entries), pageSize);
 
-        String header = VirtualChests.getPluginLanguage().get(new Lang.HISTORY_LIST_HEADER(number, player.getName()));
-        String footer = VirtualChests.getPluginLanguage().get(new Lang.HISTORY_LIST_FOOTER(number, player.getName(), page, maxPage, page - 1, page + 1));
+        String header = VirtualChests.getLanguage().get(new Lang.HISTORY_LIST_HEADER(number, player.getName()));
+        String footer = VirtualChests.getLanguage().get(new Lang.HISTORY_LIST_FOOTER(number, player.getName(), page, maxPage, page - 1, page + 1));
 
         String lines = history.stream().map(h -> {
             String date = formatDate(h.getTimestamp());
-            return VirtualChests.getPluginLanguage().get(new Lang.HISTORY_LIST_LINE(number, player.getName(), h.getId(), date));
+            return VirtualChests.getLanguage().get(new Lang.HISTORY_LIST_LINE(number, player.getName(), h.getId(), date));
         }).collect(Collectors.joining("<br>"));
 
         return MiniMessage.miniMessage().deserialize(header + "<br>" + lines + "<br>" + footer);
@@ -249,7 +249,7 @@ public final class ChestCommand {
         final Player playerTo = ctx.getArgument("player_to", PlayerSelectorArgumentResolver.class).resolve(ctx.getSource()).getFirst();
 
         if (playerFrom.getUniqueId().equals(playerTo.getUniqueId())) {
-            Component message = VirtualChests.getPluginLanguage().getFormatted(new Lang.TRANSFER_ERROR_PLAYER(playerFrom.getName()));
+            Component message = VirtualChests.getLanguage().getFormatted(new Lang.TRANSFER_ERROR_PLAYER(playerFrom.getName()));
             ctx.getSource().getSender().sendMessage(message);
             return Command.SINGLE_SUCCESS;
         }
@@ -261,7 +261,7 @@ public final class ChestCommand {
                 pendingConfirms.add(hashCode);
                 Bukkit.getScheduler().runTaskLater(VirtualChests.getInstance(), () -> pendingConfirms.remove(hashCode), 20 * 30);
                 String command = String.format("/%s transfer %s %s", COMMAND_NAME, playerFrom.getName(), playerTo.getName());
-                Component message = VirtualChests.getPluginLanguage().getFormatted(new Lang.TRANSFER_OVERWRITE_CONFIRM(playerTo.getName(), count, command));
+                Component message = VirtualChests.getLanguage().getFormatted(new Lang.TRANSFER_OVERWRITE_CONFIRM(playerTo.getName(), count, command));
                 ctx.getSource().getSender().sendMessage(message);
                 return Command.SINGLE_SUCCESS;
             }
@@ -270,7 +270,7 @@ public final class ChestCommand {
         }
 
         int transferCount = StorageProvider.getInstance().transferChests(playerFrom.getUniqueId(), playerTo.getUniqueId(), null, null);
-        Component message = VirtualChests.getPluginLanguage().getFormatted(new Lang.TRANSFER_SUCCESS(transferCount, playerFrom.getName(), playerTo.getName()));
+        Component message = VirtualChests.getLanguage().getFormatted(new Lang.TRANSFER_SUCCESS(transferCount, playerFrom.getName(), playerTo.getName()));
         ctx.getSource().getSender().sendMessage(message);
 
         return Command.SINGLE_SUCCESS;
@@ -282,7 +282,7 @@ public final class ChestCommand {
         int number = IntegerArgumentType.getInteger(ctx, "number");
 
         if (playerFrom.getUniqueId().equals(playerTo.getUniqueId())) {
-            Component message = VirtualChests.getPluginLanguage().getFormatted(new Lang.TRANSFER_ERROR_PLAYER(playerFrom.getName()));
+            Component message = VirtualChests.getLanguage().getFormatted(new Lang.TRANSFER_ERROR_PLAYER(playerFrom.getName()));
             ctx.getSource().getSender().sendMessage(message);
             return Command.SINGLE_SUCCESS;
         }
@@ -294,7 +294,7 @@ public final class ChestCommand {
                 pendingConfirms.add(hashCode);
                 Bukkit.getScheduler().runTaskLater(VirtualChests.getInstance(), () -> pendingConfirms.remove(hashCode), 20 * 30);
                 String command = String.format("/%s transfer %s %s %s", COMMAND_NAME, playerFrom.getName(), playerTo.getName(), number);
-                Component message = VirtualChests.getPluginLanguage().getFormatted(new Lang.TRANSFER_OVERWRITE_CONFIRM_SINGLE(playerTo.getName(), number, command));
+                Component message = VirtualChests.getLanguage().getFormatted(new Lang.TRANSFER_OVERWRITE_CONFIRM_SINGLE(playerTo.getName(), number, command));
                 ctx.getSource().getSender().sendMessage(message);
                 return Command.SINGLE_SUCCESS;
             }
@@ -303,7 +303,7 @@ public final class ChestCommand {
         }
 
         StorageProvider.getInstance().transferChests(playerFrom.getUniqueId(), playerTo.getUniqueId(), number, null);
-        Component message = VirtualChests.getPluginLanguage().getFormatted(new Lang.TRANSFER_SUCCESS(1, playerFrom.getName(), playerTo.getName()));
+        Component message = VirtualChests.getLanguage().getFormatted(new Lang.TRANSFER_SUCCESS(1, playerFrom.getName(), playerTo.getName()));
         ctx.getSource().getSender().sendMessage(message);
 
         return Command.SINGLE_SUCCESS;
@@ -316,7 +316,7 @@ public final class ChestCommand {
         int numberDestination = IntegerArgumentType.getInteger(ctx, "number_dest");
 
         if (playerFrom.getUniqueId().equals(playerTo.getUniqueId()) && number == numberDestination) {
-            Component message = VirtualChests.getPluginLanguage().getFormatted(new Lang.TRANSFER_ERROR_PLAYER(playerFrom.getName()));
+            Component message = VirtualChests.getLanguage().getFormatted(new Lang.TRANSFER_ERROR_PLAYER(playerFrom.getName()));
             ctx.getSource().getSender().sendMessage(message);
             return Command.SINGLE_SUCCESS;
         }
@@ -328,7 +328,7 @@ public final class ChestCommand {
                 pendingConfirms.add(hashCode);
                 Bukkit.getScheduler().runTaskLater(VirtualChests.getInstance(), () -> pendingConfirms.remove(hashCode), 20 * 30);
                 String command = String.format("/%s transfer %s %s %s %s", COMMAND_NAME, playerFrom.getName(), playerTo.getName(), number, numberDestination);
-                Component message = VirtualChests.getPluginLanguage().getFormatted(new Lang.TRANSFER_OVERWRITE_CONFIRM_SINGLE(playerTo.getName(), numberDestination, command));
+                Component message = VirtualChests.getLanguage().getFormatted(new Lang.TRANSFER_OVERWRITE_CONFIRM_SINGLE(playerTo.getName(), numberDestination, command));
                 ctx.getSource().getSender().sendMessage(message);
                 return Command.SINGLE_SUCCESS;
             }
@@ -337,7 +337,7 @@ public final class ChestCommand {
         }
 
         StorageProvider.getInstance().transferChests(playerFrom.getUniqueId(), playerTo.getUniqueId(), number, numberDestination);
-        Component message = VirtualChests.getPluginLanguage().getFormatted(new Lang.TRANSFER_SUCCESS(1, playerFrom.getName(), playerTo.getName()));
+        Component message = VirtualChests.getLanguage().getFormatted(new Lang.TRANSFER_SUCCESS(1, playerFrom.getName(), playerTo.getName()));
         ctx.getSource().getSender().sendMessage(message);
 
         return Command.SINGLE_SUCCESS;

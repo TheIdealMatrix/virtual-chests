@@ -1,1 +1,15 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        mavenCentral()
+        maven {
+            url = uri("https://maven.pkg.github.com/TheIdealMatrix/MinecraftShared")
+            credentials {
+                username = providers.gradleProperty("gpr.user").getOrNull() ?: System.getenv("GITHUB_USERNAME")
+                password = providers.gradleProperty("gpr.key").getOrNull() ?: System.getenv("GITHUB_TOKEN")
+            }
+        }
+    }
+}
+
 rootProject.name = 'VirtualChests'
